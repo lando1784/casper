@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>casper — spese periodiche di casa</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="data:,">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">👻 casper</div>
+  <div class="month-nav">
+    <button id="prev-month" class="btn ghost" title="Mese precedente">‹</button>
+    <div class="month-label" id="month-label">—</div>
+    <button id="next-month" class="btn ghost" title="Mese successivo">›</button>
+    <button id="today" class="btn ghost">Oggi</button>
+  </div>
+  <div class="total-box">
+    <span class="total-label">Totale mese</span>
+    <span class="total-value" id="month-total">—</span>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Nuova voce di spesa</h2>
+    <form id="new-expense-form" class="row-form">
+      <input id="ne-name" type="text" placeholder="Nome (es. Elettricità)" required maxlength="80">
+      <select id="ne-type">
+        <option value="fixed">Cifra (importo in €)</option>
+        <option value="unit">Costo/unità</option>
+      </select>
+      <input id="ne-cost" type="number" step="0.01" min="0" placeholder="Costo/unità (€)" class="hidden">
+      <button type="submit" class="btn primary">Aggiungi voce</button>
+    </form>
+  </section>
+
+  <section id="voices"></section>
+
+  <section class="panel export-panel">
+    <h2>Google Calendar</h2>
+    <p>Ogni inserimento ha il pulsante <strong>🗓</strong> per aggiungerlo a un calendario Google. In alternativa esporta il mese in formato <code>.ics</code> e importalo in Google Calendar (Impostazioni → Importa).</p>
+    <a id="ics-link" class="btn" download>Esporta .ics del mese</a>
+  </section>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+<script src="/app.js"></script>
+</body>
+</html>
