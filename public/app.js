@@ -40,6 +40,7 @@ function gcalUrl(title, date, details) {
 }
 
 async function api(method, path, body) {
+  if (window.__CASPER_EMBEDDED__ && window.__CASPER_API__) return window.__CASPER_API__(method, path, body);
   const res = await fetch(path, {
     method,
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
@@ -242,5 +243,29 @@ document.getElementById('voices').addEventListener('submit', async (e) => {
     toast(err.message);
   }
 });
+
+// Versione a file singolo: .ics via download client-side + backup dati locali
+if (window.__CASPER_EMBEDDED__ && window.__CASPER_API__) {
+  document.getElementById('ics-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.__CASPER_API__.downloadICS(state.month).catch((err) => toast(err.message));
+  });
+  const panel = document.getElementById('local-data-panel');
+  if (panel) panel.classList.remove('hidden');
+  document.getElementById('export-data').addEventListener('click', () => window.__CASPER_API__.downloadJSONFile());
+  document.getElementById('import-data').addEventListener('click', () => document.getElementById('import-file').click());
+  document.getElementById('import-file').addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    try {
+      await window.__CASPER_API__.importJSON(await f.text());
+      await load();
+      toast('Dati importati');
+    } catch (err) {
+      toast(err.message);
+    }
+    e.target.value = '';
+  });
+}
 
 load().catch((err) => toast(err.message));
