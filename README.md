@@ -85,6 +85,16 @@ npm run build:single     # genera dist/casper.html (~35 KB)
 - Funzionano anche offline (è un file locale), i pulsanti 🗓 Google Calendar e l'esportazione `.ics` del mese.
 - Da `file://` non è installabile come PWA (serve HTTP), ma Chrome permette "Aggiungi a schermata Home" come icona. Per la PWA completa basta copiare il file in `public/` e aprirlo via server: `cp dist/casper.html public/` → `http://localhost:3000/casper.html`.
 
+### Release con artifact pronto da scaricare
+
+Il workflow `.github/workflows/release.yml` scatta alla **pubblicazione di una release** (`on: release: [published]`): esegue i test, compila `dist/casper.html` e lo **allega come asset della release** (con `contents: write` sul `GITHUB_TOKEN`, re-upload con `--clobber`).
+
+```bash
+gh release create v1.0.0 --title "casper v1.0.0" --generate-notes
+# dopo qualche secondo: https://github.com/lando1784/casper/releases/tag/v1.0.0
+# → asset "casper.html" scaricabile, da mandare a anyone via WhatsApp/Drive
+```
+
 ## Struttura
 
 ```
