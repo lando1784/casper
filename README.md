@@ -51,6 +51,25 @@ L'app è **responsive** e installabile come PWA (manifest + service worker + ico
 
 Nota: l'installazione standalone completa (senza barra del browser) su Chrome Android richiede un **contesto sicuro (HTTPS)**; in HTTP su rete locale ottieni comunque la scorciatoia nella home. Per HTTPS in casa puoi usare un reverse proxy locale con certificato (es. Caddy) oppure un tunnel.
 
+### Server locale direttamente sul telefono (Termux, senza PC)
+
+Con [Termux](https://f-droid.org/packages/com.termux/) (da F-Droid) il server Node gira **sul telefono stesso**: dati e app restano sul dispositivo.
+
+```bash
+# dentro Termux
+pkg update -y && pkg install -y nodejs git
+git clone https://github.com/lando1784/casper.git ~/casper
+sh ~/casper/scripts/termux-setup.sh     # aggiorna il repo e avvia il server
+# in alternativa, se hai copiato la cartella via USB/condivisione: sh scripts/termux-setup.sh
+```
+
+Poi apri Chrome sul telefono su **http://localhost:3000**: `localhost` è un *contesto sicuro*, quindi service worker e installazione PWA funzionano in plein (menu → **Installa app** / **Aggiungi a schermata Home**, apertura standalone, cache offline).
+
+- `termux-wake-lock` (incluso nello script, se disponibile) impedisce al telefono di sospendere il server a schermo spento.
+- I dati vivono in `~/casper/data/db.json` — per un backup copia la cartella `data/`.
+- `npm test` esegue i test anche sul telefono; `npm start` (o `sh scripts/start.sh`) riavvia il server.
+- All'avvio il server stampa anche `http://<IP-del-telefono>:3000`, utile per raggiungere l'app da altri dispositivi della stessa Wi-Fi.
+
 ## Struttura
 
 ```
@@ -61,5 +80,6 @@ src/month.js       utilità su mesi/date
 src/calendar.js    generazione .ics e link Google Calendar
 src/errors.js      HttpError
 public/            frontend (index.html, app.js, style.css, sw.js, manifest, icone)
+scripts/           start.sh (avvio locale) e termux-setup.sh (setup Android/Termux)
 tests/             test API end-to-end
 ```
