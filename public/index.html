@@ -2,10 +2,16 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Gestisci le spese periodiche di casa: voci di spesa, inserimenti, totale mensile e Google Calendar.">
+<meta name="theme-color" content="#5b5bd6">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="casper">
 <title>casper — spese periodiche di casa</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="/style.css">
-<link rel="icon" href="data:,">
 </head>
 <body>
 <header class="topbar">
@@ -47,5 +53,12 @@
 
 <div id="toast" class="toast hidden"></div>
 <script src="/app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => console.warn('SW non registrato:', err));
+  });
+}
+</script>
 </body>
 </html>

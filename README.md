@@ -41,6 +41,16 @@ Configurabili via env: `PORT` (default 3000), `DATA_FILE` (default `data/db.json
 | GET | `/api/calendar.ics?month=YYYY-MM` | esportazione iCalendar del mese |
 | GET | `/api/health` | stato del server |
 
+## Uso da smartphone (Android)
+
+L'app è **responsive** e installabile come PWA (manifest + service worker + icone):
+
+1. Avvia il server sul PC: `npm start` (ascolta su tutte le interfacce, porta 3000).
+2. Dal telefono Android, stessa rete Wi-Fi, apri `http://<IP-del-PC>:3000` (es. `http://192.168.1.10:3000`).
+3. Menu Chrome → **Aggiungi a schermata Home** (o "Installa app"): icona del fantasmino, apertura a schermo intero, funzionamento offline per la parte statica (i dati restano sul server; le API usano la rete con fallback alla cache).
+
+Nota: l'installazione standalone completa (senza barra del browser) su Chrome Android richiede un **contesto sicuro (HTTPS)**; in HTTP su rete locale ottieni comunque la scorciatoia nella home. Per HTTPS in casa puoi usare un reverse proxy locale con certificato (es. Caddy) oppure un tunnel.
+
 ## Struttura
 
 ```
@@ -50,6 +60,6 @@ src/store.js       dominio e persistenza JSON (scrittura atomica)
 src/month.js       utilità su mesi/date
 src/calendar.js    generazione .ics e link Google Calendar
 src/errors.js      HttpError
-public/            frontend (index.html, app.js, style.css)
+public/            frontend (index.html, app.js, style.css, sw.js, manifest, icone)
 tests/             test API end-to-end
 ```
