@@ -70,6 +70,21 @@ Poi apri Chrome sul telefono su **http://localhost:3000**: `localhost` è un *co
 - `npm test` esegue i test anche sul telefono; `npm start` (o `sh scripts/start.sh`) riavvia il server.
 - All'avvio il server stampa anche `http://<IP-del-telefono>:3000`, utile per raggiungere l'app da altri dispositivi della stessa Wi-Fi.
 
+## File singolo da condividere (una sola pagina HTML)
+
+Per usarla senza server (es. sul telefono di un familiare) si può generare **un unico file HTML** con tutta l'app dentro:
+
+```bash
+npm run build:single     # genera dist/casper.html (~35 KB)
+```
+
+`dist/casper.html` è autosufficiente: HTML + CSS + JS + logica dati in un solo file.
+
+- Inviarlo via WhatsApp/Drive/email e aprirlo con **Chrome** sul telefono Android.
+- I dati restano nel browser del dispositivo (`localStorage`); pulsanti **Esporta/Importa dati (.json)** nel pannello "Dati locali" servono per backup e cambio telefono.
+- Funzionano anche offline (è un file locale), i pulsanti 🗓 Google Calendar e l'esportazione `.ics` del mese.
+- Da `file://` non è installabile come PWA (serve HTTP), ma Chrome permette "Aggiungi a schermata Home" come icona. Per la PWA completa basta copiare il file in `public/` e aprirlo via server: `cp dist/casper.html public/` → `http://localhost:3000/casper.html`.
+
 ## Struttura
 
 ```
@@ -80,6 +95,7 @@ src/month.js       utilità su mesi/date
 src/calendar.js    generazione .ics e link Google Calendar
 src/errors.js      HttpError
 public/            frontend (index.html, app.js, style.css, sw.js, manifest, icone)
-scripts/           start.sh (avvio locale) e termux-setup.sh (setup Android/Termux)
+scripts/           start.sh, termux-setup.sh (Android), build-single-html.js (file singolo)
+dist/              output di build:single (gitignored)
 tests/             test API end-to-end
 ```

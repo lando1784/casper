@@ -44,6 +44,14 @@
 
   <section id="voices"></section>
 
+  <section class="panel export-panel hidden" id="local-data-panel">
+    <h2>Dati locali (versione file singolo)</h2>
+    <p>In questa versione i dati restano salvati nel browser di questo dispositivo. Esporta un backup <code>.json</code> prima di cambiare telefono o cancellare i dati del browser.</p>
+    <button id="export-data" class="btn">⬇ Esporta dati (.json)</button>
+    <button id="import-data" class="btn">⬆ Importa dati (.json)</button>
+    <input type="file" id="import-file" accept=".json,application/json" class="hidden">
+  </section>
+
   <section class="panel export-panel">
     <h2>Google Calendar</h2>
     <p>Ogni inserimento ha il pulsante <strong>🗓</strong> per aggiungerlo a un calendario Google. In alternativa esporta il mese in formato <code>.ics</code> e importalo in Google Calendar (Impostazioni → Importa).</p>
@@ -54,7 +62,7 @@
 <div id="toast" class="toast hidden"></div>
 <script src="/app.js"></script>
 <script>
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((err) => console.warn('SW non registrato:', err));
   });

@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "build:single": "node scripts/build-single-html.js"
   },
   "license": "MIT"
 }
