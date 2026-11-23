@@ -1,0 +1,41 @@
+name: Release
+
+# Alla pubblicazione di una release crea dist/casper.html (file singolo
+# dell'app) e lo allega come asset scaricabile dalla pagina della release.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  single-html:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test
+        run: npm test
+
+      - name: Build file singolo
+        run: node scripts/build-single-html.js dist/casper.html
+
+      - name: Verifica artifact
+        run: |
+          test -s dist/casper.html
+          grep -q 'window.__CASPER_EMBEDDED__ = true' dist/casper.html
+          grep -q 'CasperEmbedded' dist/casper.html
+          echo "casper.html OK ($(du -h dist/casper.html | cut -f1))" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Allega casper.html alla release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$GITHUB_REF_NAME" dist/casper.html --clobber --repo "$GITHUB_REPOSITORY"
+
+      - name: Riepilogo
+        run: echo "Asset casper.html pubblicato sulla release $GITHUB_REF_NAME" >> "$GITHUB_STEP_SUMMARY"
