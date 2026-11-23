@@ -175,6 +175,36 @@ test('API: flusso completo spese', async (t) => {
   assert.ok(fs.existsSync(path.join(dir, 'db.json')));
 });
 
+test('PWA: manifest, service worker, icone e meta tag serviti', async (t) => {
+  const { server, base } = await startServer();
+  t.after(() => server.close());
+
+  const manifest = await api(base, 'GET', '/manifest.webmanifest');
+  assert.equal(manifest.status, 200);
+  assert.match(manifest.headers.get('content-type'), /application\/manifest\+json/);
+  assert.equal(manifest.json.display, 'standalone');
+  assert.equal(manifest.json.start_url, '/');
+  assert.ok(manifest.json.icons.length >= 2);
+  for (const icon of manifest.json.icons) {
+    const res = await fetch(base + icon.src);
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get('content-type'), /image\/png/);
+    const buf = Buffer.from(await res.arrayBuffer());
+    assert.deepEqual([...buf.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]); // firma PNG
+    assert.equal(buf.readUInt32BE(16), Number(icon.sizes.split('x')[0]));
+  }
+
+  const sw = await api(base, 'GET', '/sw.js');
+  assert.equal(sw.status, 200);
+  assert.match(sw.text, /addEventListener\('fetch'/);
+  assert.match(sw.text, /manifest\.webmanifest/);
+
+  const index = await api(base, 'GET', '/');
+  assert.match(index.text, /rel="manifest" href="\/manifest\.webmanifest"/);
+  assert.match(index.text, /name="theme-color"/);
+  assert.match(index.text, /serviceWorker\.register/);
+});
+
 test('API: persistenza su ricarico dello store', async (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'casper-persist-'));
   const file = path.join(dir, 'db.json');
