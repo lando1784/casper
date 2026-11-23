@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { spawn } = require('child_process');
 const { createApp } = require('../src/app');
 const { shiftMonth, isValidMonth, isValidDate, addDaysISO } = require('../src/month');
 const { buildICS, escapeICS, googleCalendarUrl } = require('../src/calendar');
@@ -203,6 +204,34 @@ test('PWA: manifest, service worker, icone e meta tag serviti', async (t) => {
   assert.match(index.text, /rel="manifest" href="\/manifest\.webmanifest"/);
   assert.match(index.text, /name="theme-color"/);
   assert.match(index.text, /serviceWorker\.register/);
+});
+
+test('avvio: server.js stampa gli URL e risponde su /api/health', async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'casper-boot-'));
+  const child = spawn(process.execPath, ['server.js'], {
+    cwd: path.join(__dirname, '..'),
+    env: { ...process.env, PORT: '0', DATA_FILE: path.join(dir, 'db.json') },
+  });
+  t.after(() => child.kill());
+  let out = '';
+  const port = await new Promise((resolve, reject) => {
+    const to = setTimeout(() => reject(new Error(`timeout avvio. Output: ${out}`)), 10000);
+    child.stdout.on('data', (d) => {
+      out += d;
+      const m = out.match(/http:\/\/localhost:(\d+)/);
+      if (m) {
+        clearTimeout(to);
+        resolve(Number(m[1]));
+      }
+    });
+    child.stderr.on('data', (d) => { out += d; });
+    child.on('error', reject);
+  });
+  assert.ok(port > 0);
+  assert.match(out, /Dati salvati in:/);
+  const res = await fetch(`http://127.0.0.1:${port}/api/health`);
+  assert.equal(res.status, 200);
+  assert.equal((await res.json()).ok, true);
 });
 
 test('API: persistenza su ricarico dello store', async (t) => {
